@@ -1,0 +1,3 @@
+[submodule "spider-api"]
+	path = spider-api
+	url = https://github.com/dongkuo/beetv-spider-api.git
