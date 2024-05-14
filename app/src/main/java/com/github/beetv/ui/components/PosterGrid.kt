@@ -1,11 +1,9 @@
 package com.github.beetv.ui.components
 
+import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.github.beetv.data.model.GroupedItems
@@ -30,35 +29,27 @@ import com.github.beetv.data.model.Item
 import com.github.beetv.data.model.ViewStyle
 
 @Composable
-@OptIn(ExperimentalLayoutApi::class, ExperimentalLayoutApi::class)
-fun PosterFlow(
+fun PosterGrid(
     groupedItemsList: List<GroupedItems>,
     viewStyle: ViewStyle,
+    modifier: Modifier = Modifier,
     onClick: (Item) -> Unit
 ) {
-    LazyColumn {
+    LazyColumn(modifier) {
         items(groupedItemsList) {
-            Column(Modifier.fillMaxSize()) {
-                // title
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     it.title,
                     fontSize = MaterialTheme.typography.titleLarge.fontSize,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+                    modifier = Modifier.padding(start = 16.dp)
                 )
-                // poster grid
-                //        LazyVerticalGrid(
-                //            columns = GridCells.Adaptive(minSize = 210.dp),
-                //            modifier = Modifier.fillMaxSize()
-                //        ) {
-                //            items(posterItems, PosterItem::id) {
-                //                Item(it, onClick)
-                //            }
-                //        }
-                FlowRow(
-                    modifier = Modifier.padding(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
+                AdaptiveGrid(minWidth = viewStyle.thumbnailWidth.dp) {
                     it.items.forEach {
                         Poster(it, viewStyle, onClick)
                     }
@@ -71,10 +62,10 @@ fun PosterFlow(
 @Composable
 fun Poster(item: Item, viewStyle: ViewStyle, onClick: (Item) -> Unit) {
     Column(modifier = Modifier
-        .width(viewStyle.thumbnailWidth.dp)
+        .fillMaxWidth()
         .clip(RoundedCornerShape(4.dp))
         .clickable { onClick(item) }
-        .padding(8.dp)
+        .padding(16.dp)
     ) {
         AsyncImage(
             model = item.thumbnail,
@@ -87,11 +78,18 @@ fun Poster(item: Item, viewStyle: ViewStyle, onClick: (Item) -> Unit) {
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
         Spacer(Modifier.height(8.dp))
-        Text(item.title, color = MaterialTheme.colorScheme.onPrimaryContainer)
+        Text(
+            text = item.title,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
         Text(
             item.desc,
             fontSize = MaterialTheme.typography.bodySmall.fontSize,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

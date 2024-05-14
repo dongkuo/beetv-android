@@ -6,7 +6,7 @@ import com.github.beetv.data.model.Page
 import com.github.beetv.data.repository.ContentRepository
 
 class AliPanContentRepository : ContentRepository {
-    override suspend fun groupContent(pageNum: Long, pageSize: Long): Page<GroupedItems> {
+    override suspend fun groupContent(): List<GroupedItems> {
         TODO("Not yet implemented")
     }
 

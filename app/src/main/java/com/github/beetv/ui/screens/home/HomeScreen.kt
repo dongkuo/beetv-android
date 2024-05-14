@@ -1,23 +1,18 @@
 package com.github.beetv.ui.screens.home
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.beetv.BeetvApplication
-import com.github.beetv.data.model.GroupedItems
 import com.github.beetv.data.model.ViewType
 import com.github.beetv.data.repository.ChannelRepository
-import com.github.beetv.data.repository.ContentRepository
-import com.github.beetv.ui.components.PosterFlow
+import com.github.beetv.ui.components.LoadingIndicator
+import com.github.beetv.ui.components.PosterGrid
 import com.github.beetv.ui.components.SideBar
 import com.github.beetv.ui.components.TabBar
 
@@ -40,7 +35,7 @@ fun HomeScreen(
         Column {
             // Top: TabBar
             TabBar(viewModel.selectedTabIndex, viewModel.tabBarItems, viewModel::onTabSelect)
-            // Bottom: Content
+            // Main: Content
             when (viewModel.currentChannel().viewType) {
                 ViewType.POSTER_FLOW -> PosterFlowView(viewModel)
                 ViewType.FILE_EXPLORER -> FileExplorerView(viewModel)
@@ -52,16 +47,17 @@ fun HomeScreen(
 
 @Composable
 fun PosterFlowView(viewModel: HomeViewModel) {
-    val channel = viewModel.currentChannel()
-    var pageNum: Long by remember { mutableLongStateOf(1) }
-    var pageSize: Long by remember { mutableLongStateOf(10) }
-    var data by remember { mutableStateOf(listOf<GroupedItems>()) }
-    val contentRepository = remember { ContentRepository.resolve(channel) }
-    LaunchedEffect(channel) {
-        val page = contentRepository.groupContent(pageNum, pageSize)
-        data += page.data
+    if (viewModel.isFirstLoading) {
+        LaunchedEffect(Unit) {
+            viewModel.loadGroupItems()
+        }
     }
-    PosterFlow(data, channel.viewStyle) {}
+    Box {
+        PosterGrid(viewModel.groupItems, viewModel.currentChannel().viewStyle) {}
+        if (viewModel.isLoading) {
+            LoadingIndicator()
+        }
+    }
 }
 
 @Composable

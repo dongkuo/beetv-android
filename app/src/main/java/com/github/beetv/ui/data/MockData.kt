@@ -4,8 +4,9 @@ import com.github.beetv.R
 import com.github.beetv.data.model.Channel
 import com.github.beetv.data.model.ChannelType
 import com.github.beetv.data.model.Item
-import com.github.beetv.data.model.ViewStyle
 import com.github.beetv.data.model.ViewType
+import com.github.beetv.data.repository.content.spider.SpiderConfig
+import com.github.beetv.data.util.toJson
 import kotlin.random.Random
 
 val items = listOf(
@@ -61,21 +62,14 @@ val items = listOf(
 
 fun randomItems() = items.shuffled().take(Random.nextInt(4, items.size))
 
-val channels = listOf(
-    Channel(
-        1,
-        R.drawable.ic_movie,
-        "韩剧TV",
-        ChannelType.SPIDER,
-        ViewType.POSTER_FLOW,
-        ViewStyle(200F, 1.78F)
-    ),
+val mockChannels = listOf(
     Channel(
         2,
         R.drawable.ic_movie,
         "美剧TV",
         ChannelType.SPIDER,
-        ViewType.POSTER_FLOW
+        ViewType.POSTER_FLOW,
+        config = SpiderConfig("classes.dex", "com.github.beetv.spider.MeiJuTVSpider").toJson()
     ),
     Channel(
         3,
