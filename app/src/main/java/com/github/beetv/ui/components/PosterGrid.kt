@@ -1,6 +1,5 @@
 package com.github.beetv.ui.components
 
-import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,19 +22,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.github.beetv.data.model.GroupedItems
+import com.github.beetv.data.model.ItemGroup
 import com.github.beetv.data.model.Item
-import com.github.beetv.data.model.ViewStyle
+import com.github.beetv.data.model.PosterGridViewStyle
 
 @Composable
 fun PosterGrid(
-    groupedItemsList: List<GroupedItems>,
-    viewStyle: ViewStyle,
+    itemGroups: List<ItemGroup>,
+    style: PosterGridViewStyle,
     modifier: Modifier = Modifier,
-    onClick: (Item) -> Unit
+    onClickItem: (Item) -> Unit
 ) {
     LazyColumn(modifier) {
-        items(groupedItemsList) {
+        items(itemGroups) {
             Column(
                 Modifier
                     .fillMaxSize()
@@ -49,9 +47,9 @@ fun PosterGrid(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 16.dp)
                 )
-                AdaptiveGrid(minWidth = viewStyle.thumbnailWidth.dp) {
+                AdaptiveGrid(minWidth = style.thumbWidth.dp) {
                     it.items.forEach {
-                        Poster(it, viewStyle, onClick)
+                        Poster(it, style, onClickItem)
                     }
                 }
             }
@@ -60,7 +58,7 @@ fun PosterGrid(
 }
 
 @Composable
-fun Poster(item: Item, viewStyle: ViewStyle, onClick: (Item) -> Unit) {
+fun Poster(item: Item, style: PosterGridViewStyle, onClick: (Item) -> Unit) {
     Column(modifier = Modifier
         .fillMaxWidth()
         .clip(RoundedCornerShape(4.dp))
@@ -73,7 +71,7 @@ fun Poster(item: Item, viewStyle: ViewStyle, onClick: (Item) -> Unit) {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(viewStyle.thumbnailAspectRatio)
+                .aspectRatio(style.thumbAspectRatio)
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
@@ -84,12 +82,14 @@ fun Poster(item: Item, viewStyle: ViewStyle, onClick: (Item) -> Unit) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        Text(
-            item.desc,
-            fontSize = MaterialTheme.typography.bodySmall.fontSize,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        if (item.desc.isNotBlank()) {
+            Text(
+                text = item.desc,
+                fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }

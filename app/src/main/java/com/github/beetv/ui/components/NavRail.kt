@@ -1,6 +1,5 @@
 package com.github.beetv.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,45 +11,59 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
-enum class Position {
-    TOP,
-    CENTER,
-    Bottom
-}
 
-data class SideBarItem(
-    val id: String,
+data class NavRailItem(
     val icon: Int,
     val title: String,
-    val position: Position
-)
+    val position: Position,
+    val route: String? = null,
+) {
+    enum class Position {
+        TOP,
+        CENTER,
+        BOTTOM
+    }
+}
 
 @Composable
-fun SideBar(
+fun NavRail(
     selectedIndex: Int,
-    sideBarItems: List<SideBarItem>,
-    onItemClick: (Int, SideBarItem) -> Unit
+    navRailItems: List<NavRailItem>,
+    onItemClick: (Int, NavRailItem) -> Unit
 ) {
     // group by position
-    val sideBarItemGroupMap = sideBarItems.groupBy(SideBarItem::position)
-    Log.i("SideBar", "sideBarItems=$sideBarItems, sideBarItemGroupMap=$sideBarItemGroupMap")
+    val navRailItemGroupMap = navRailItems.groupBy(NavRailItem::position)
     NavigationRail(
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         modifier = Modifier.fillMaxHeight()
     ) {
         // Top
         Spacer(Modifier.height(4.dp))
-        ItemGroup(selectedIndex, sideBarItemGroupMap[Position.TOP], sideBarItems, onItemClick)
+        ItemGroup(
+            selectedIndex,
+            navRailItemGroupMap[NavRailItem.Position.TOP],
+            navRailItems,
+            onItemClick
+        )
         // Center
         Spacer(Modifier.height(16.dp))
-        ItemGroup(selectedIndex, sideBarItemGroupMap[Position.CENTER], sideBarItems, onItemClick)
+        ItemGroup(
+            selectedIndex,
+            navRailItemGroupMap[NavRailItem.Position.CENTER],
+            navRailItems,
+            onItemClick
+        )
         // Bottom
-        ItemGroup(selectedIndex, sideBarItemGroupMap[Position.Bottom], sideBarItems, onItemClick)
+        ItemGroup(
+            selectedIndex,
+            navRailItemGroupMap[NavRailItem.Position.BOTTOM],
+            navRailItems,
+            onItemClick
+        )
         Spacer(Modifier.height(4.dp))
     }
 }
@@ -58,14 +71,14 @@ fun SideBar(
 @Composable
 private fun ItemGroup(
     selectedIndex: Int,
-    groupItems: List<SideBarItem>?,
-    totalItems: List<SideBarItem>,
-    onItemClick: (Int, SideBarItem) -> Unit
+    groupItems: List<NavRailItem>?,
+    totalItems: List<NavRailItem>,
+    onItemClick: (Int, NavRailItem) -> Unit
 ) {
     if (!groupItems.isNullOrEmpty()) {
         Column {
             groupItems.forEach {
-                Poster(
+                Item(
                     totalItems[selectedIndex] == it,
                     groupItems.last() == it,
                     totalItems.indexOf(it),
@@ -78,25 +91,25 @@ private fun ItemGroup(
 }
 
 @Composable
-private fun Poster(
+private fun Item(
     selected: Boolean,
     isLastInGroup: Boolean,
     index: Int,
-    sideBarItem: SideBarItem,
-    onItemClick: (Int, SideBarItem) -> Unit
+    navRailItem: NavRailItem,
+    onItemClick: (Int, NavRailItem) -> Unit
 ) {
     NavigationRailItem(
-        label = { Text(sideBarItem.title) },
+        label = { Text(navRailItem.title) },
         icon = {
             Icon(
-                painter = painterResource(sideBarItem.icon),
-                sideBarItem.title,
+                painter = painterResource(navRailItem.icon),
+                navRailItem.title,
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(28.dp)
             )
         },
         selected = selected,
-        onClick = { onItemClick(index, sideBarItem) }
+        onClick = { onItemClick(index, navRailItem) }
     )
     if (!isLastInGroup) {
         Spacer(Modifier.height(8.dp))

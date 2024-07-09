@@ -7,4 +7,4 @@ data class Item(
     val desc: String,
 )
 
-data class GroupedItems(val title: String, val items: List<Item>)
+data class ItemGroup(val title: String, val items: List<Item>)

@@ -11,17 +11,17 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.github.beetv.ext.painter
 
-data class TabBarItem<T>(val icon: Int, val title: String, val data: T)
+data class TabItem<T>(val icon: String, val title: String, val data: T)
 
 
 @Composable
 fun <T> TabBar(
     selectedTabIndex: Int,
-    tabs: List<TabBarItem<T>>,
-    onItemClick: (Int, TabBarItem<T>) -> Unit,
+    tabs: List<TabItem<T>>,
+    onItemClick: (Int, TabItem<T>) -> Unit,
 ) {
     if (tabs.size <= 6) {
         TabRow(
@@ -43,8 +43,8 @@ fun <T> TabBar(
 @Composable
 private fun <T> Tab(
     selectedTabIndex: Int,
-    tabs: List<TabBarItem<T>>,
-    onClick: (Int, TabBarItem<T>) -> Unit
+    tabs: List<TabItem<T>>,
+    onClick: (Int, TabItem<T>) -> Unit
 ) {
     tabs.forEachIndexed { index, item ->
         val color = if (selectedTabIndex == index)
@@ -62,7 +62,7 @@ private fun <T> Tab(
             },
             icon = {
                 Icon(
-                    painter = painterResource(item.icon),
+                    painter = painter(item.icon),
                     contentDescription = item.title,
                     tint = color,
                     modifier = Modifier.size(20.dp)

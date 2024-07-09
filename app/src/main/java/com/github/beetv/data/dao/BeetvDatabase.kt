@@ -1,37 +1,38 @@
 package com.github.beetv.data.dao
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.fasterxml.jackson.core.type.TypeReference
+import com.github.beetv.ext.fromJson
+import com.github.beetv.ext.toJson
 import com.github.beetv.data.model.Channel
-import com.github.beetv.data.util.Converters
-import kotlinx.coroutines.CoroutineScope
+import com.github.beetv.data.model.ChannelConfig
+import com.github.beetv.data.model.ViewStyle
 
 @Database(entities = [Channel::class], version = 1)
-@TypeConverters(Converters::class)
+@TypeConverters(ChannelStyleJsonConverter::class, ChannelConfigJsonConverter::class)
 abstract class BeetvDatabase : RoomDatabase() {
 
     abstract fun channelDao(): ChannelDao
 
     companion object {
-        @Volatile
-        private var INSTANCE: BeetvDatabase? = null
-
-        fun getDatabase(context: Context, scope: CoroutineScope): BeetvDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room
-                    .databaseBuilder(
-                        context.applicationContext,
-                        BeetvDatabase::class.java,
-                        "beetv.db"
-                    )
-                    .fallbackToDestructiveMigration()
-                    .build()
-                INSTANCE = instance
-                return instance
-            }
-        }
+        const val DATABASE_NAME = "beetv.db"
     }
+}
+
+class ChannelStyleJsonConverter :
+    JsonConverter<ViewStyle>(object : TypeReference<ViewStyle>() {})
+
+class ChannelConfigJsonConverter :
+    JsonConverter<ChannelConfig>(object : TypeReference<ChannelConfig>() {})
+
+abstract class JsonConverter<T>(private val typeReference: TypeReference<T>) {
+
+    @TypeConverter
+    fun fromJson(json: String): T = json.fromJson(typeReference)
+
+    @TypeConverter
+    fun toJson(bean: T): String? = bean?.toJson()
 }

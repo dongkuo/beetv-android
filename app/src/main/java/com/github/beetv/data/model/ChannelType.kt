@@ -20,5 +20,9 @@ enum class ChannelType {
      * 爬虫
      */
     SPIDER,
+
+    /**
+     * 空
+     */
     NONE,
 }
